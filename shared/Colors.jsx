@@ -1,0 +1,28 @@
+export default {
+    primary: '#174D88',
+
+    white: '#FFFFFF',
+    black: '#000000',
+    gray: '#808080',
+    red: '#FF0A0A',
+    green: '#00FF00',
+    blue: '#0000FF',
+    yellow: '#FFFF00',
+    cyan: '#00FFFF',
+    magenta: '#FF00FF',
+    orange: '#FFA500',
+    purple: '#800080',
+    pink: '#FFC0CB',
+    brown: '#A52A2A',
+    teal: '#008080',
+    navy: '#000080',
+    maroon: '#800000',
+    olive: '#808000',
+    silver: '#C0C0C0',
+    gold: '#FFD700',
+    lime: '#00FF00',
+    coral: '#FF7F50',
+    salmon: '#FA8072',
+    lavender: '#E6E6FA',
+
+    }
