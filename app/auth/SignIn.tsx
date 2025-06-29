@@ -20,11 +20,11 @@ import { useAuth } from '../../contexts/AuthContext';
 
 export default function SignIn() {
   const router = useRouter();
-  const { signIn, loading } = useAuth();
+  const { signIn } = useAuth();
 
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
-  const [alertType, setAlertType] = useState('error'); // 'error' or 'success'
+  const [alertType, setAlertType] = useState<'error' | 'success'>('error');
 
   const [loginIdentifier, setLoginIdentifier] = useState('');
   const [password, setPassword] = useState('');
@@ -33,7 +33,7 @@ export default function SignIn() {
   const [passwordError, setPasswordError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const validateEmail = (email) => {
+  const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };

@@ -1,4 +1,14 @@
-import {StyleSheet,View, Text, Image,TouchableOpacity,ImageBackground,Dimensions, Pressable, ActivityIndicator} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  ImageBackground,
+  Dimensions,
+  Pressable,
+  ActivityIndicator
+} from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import React, { useState } from 'react';
 import Colors from './../../shared/Colors';
@@ -14,7 +24,7 @@ export default function SignUp() {
 
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
-  const [alertType, setAlertType] = useState('error');
+  const [alertType, setAlertType] = useState<'error' | 'success'>('error');
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -27,7 +37,7 @@ export default function SignUp() {
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const validateEmail = (email) => {
+  const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };

@@ -9,56 +9,55 @@ const Input = ({
   password = false,
   secureTextEntry = false,
   errorMessage,
-  disabled= false,
+  disabled = false,
+  value,
   style,
   ...props
 }) => {
   return (
-      <View style={{ width: '100%' }}>
-            {label && <Text style={styles.label}>{label}</Text>}
+    <View style={{ width: '100%' }}>
+      {label && <Text style={styles.label}>{label}</Text>}
 
       <TextInput
-        //style={[styles.input, style]}
         placeholder={placeholder}
         placeholderTextColor={Colors.primary}
-        secureTextEntry={password}
-        editable={!disabled} // ✅ disable input
-        onChangeText={(value) => onChangeText(value)}
-
-        style={{
+        secureTextEntry={password || secureTextEntry}
+        editable={!disabled}
+        value={value}
+        onChangeText={onChangeText}
+        style={[
+          {
             padding: 14,
             paddingVertical: 10,
             borderWidth: 1,
-            borderColor: Colors.primary,
+            borderColor: errorMessage ? Colors.red : Colors.primary,
             borderRadius: 10,
             fontSize: 18,
             marginTop: 15,
             width: '100%',
-            }}
+            backgroundColor: disabled ? '#f5f5f5' : 'white',
+            color: disabled ? Colors.gray : Colors.primary,
+          },
+          style
+        ]}
         {...props}
-
       />
       {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
-        </View>
-
-
+    </View>
   );
 };
-
 
 export default Input;
 
 const styles = StyleSheet.create({
-    label: {
-        fontSize: 16,
-        color: Colors.primary,
-        marginBottom: 5,
-    },
-
-    error: {
-        color: Colors.red,
-        fontSize: 14,
-        margginTop: 5,
-    },
-    });
-
+  label: {
+    fontSize: 16,
+    color: Colors.primary,
+    marginBottom: 5,
+  },
+  error: {
+    color: Colors.red,
+    fontSize: 14,
+    marginTop: 5,
+  },
+});
