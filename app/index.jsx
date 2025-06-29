@@ -1,12 +1,37 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {StyleSheet,View,Text,Image,ImageBackground,Dimensions} from "react-native";
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import Colors from './../shared/Colors';
 import Button from './../components/shared/Button';
 import { useRouter } from 'expo-router';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Index() {
     const router = useRouter();
+    const { user, loading } = useAuth();
+
+    useEffect(() => {
+      if (!loading && user) {
+        // If user is already logged in, redirect to main app
+        router.replace('/(tabs)');
+      }
+    }, [user, loading]);
+
+    if (loading) {
+      return (
+        <SafeAreaProvider>
+          <SafeAreaView style={styles.container}>
+            <Text style={styles.loadingText}>লোড হচ্ছে...</Text>
+          </SafeAreaView>
+        </SafeAreaProvider>
+      );
+    }
+
+    // Only show welcome screen if user is not logged in
+    if (user) {
+      return null; // Will redirect in useEffect
+    }
+
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
@@ -24,16 +49,9 @@ export default function Index() {
             style={styles.topCenterLogo}
           />
           <Text style={styles.title}>Alayna Enterprise</Text>
-          <Text
-          style={{
-                  textAlign: 'center',
-                  marginHorizontal: 20,
-                  fontSize: 14,
-                  color: Colors.primary,
-                  marginTop: 10,
-                  opacity:0.8
-              }}
-          >আমাদের ব্যাবসায়ের কাজের জন্য</Text>
+          <Text style={styles.subtitle}>
+            আমাদের ব্যাবসায়ের কাজের জন্য
+          </Text>
         </View>
 
        <Button title="Get Started" onPress={() => router.push('/auth/SignIn')} />
@@ -81,7 +99,6 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 40,
-    //borderWidth: 2,
     borderColor: '#FFF0F5',
     opacity: 0.8,
     marginBottom: 8,
@@ -92,6 +109,19 @@ const styles = StyleSheet.create({
     fontSize: 30,
     lineHeight: 40,
     fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  subtitle: {
+    textAlign: 'center',
+    marginHorizontal: 20,
+    fontSize: 14,
+    color: Colors.primary,
+    marginTop: 10,
+    opacity: 0.8,
+  },
+  loadingText: {
+    fontSize: 18,
+    color: Colors.primary,
     textAlign: 'center',
   },
 });

@@ -7,7 +7,7 @@ import {
   ImageBackground,
   Dimensions,
   Pressable,
-  Alert
+  ActivityIndicator
 } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import React, { useState } from 'react';
@@ -16,39 +16,81 @@ import Button from './../../components/shared/Button';
 import Input from './../../components/shared/Input';
 import CustomAlert from './../../components/shared/Alert';
 import { useRouter } from 'expo-router';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function SignIn() {
   const router = useRouter();
+  const { signIn, loading } = useAuth();
 
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState('error'); // 'error' or 'success'
 
-  const [LoginIdentifier, setLoginIdentifier] = useState('');
-  const [Password, setPassword] = useState('');
+  const [loginIdentifier, setLoginIdentifier] = useState('');
+  const [password, setPassword] = useState('');
 
   const [loginError, setLoginError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const onSignIn = () => {
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const onSignIn = async () => {
     let hasError = false;
 
-    if (!LoginIdentifier.trim()) {
-        Alert.alert('Missing Information', 'ই-মেইল বা মোবাইল নম্বর আবশ্যক');
-        setLoginError('মোবাইল নম্বর আবশ্যক');
-        hasError = true;
-    } else {
-      setLoginError('');
+    // Reset errors
+    setLoginError('');
+    setPasswordError('');
+
+    // Validation
+    if (!loginIdentifier.trim()) {
+      setLoginError('ই-মেইল আবশ্যক');
+      hasError = true;
+    } else if (!validateEmail(loginIdentifier.trim())) {
+      setLoginError('বৈধ ই-মেইল ঠিকানা লিখুন');
+      hasError = true;
     }
-    if (!Password.trim()) {
-        Alert.alert('Missing Information', 'পাসওয়ার্ড আবশ্যক');
-        setPasswordError('পাসওয়ার্ড আবশ্যক');
-        hasError = true;
-    } else {
-      setPasswordError('');
+
+    if (!password.trim()) {
+      setPasswordError('পাসওয়ার্ড আবশ্যক');
+      hasError = true;
+    } else if (password.length < 6) {
+      setPasswordError('পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে');
+      hasError = true;
     }
+
     if (hasError) return;
-    setAlertMessage('এই পেইজের কাজ চলছে, দয়া করে পরে আবার চেষ্টা করুন।');
-    setShowAlert(true);
+
+    setIsLoading(true);
+
+    try {
+      const result = await signIn(loginIdentifier.trim(), password);
+      
+      if (result.success) {
+        setAlertType('success');
+        setAlertMessage(result.message);
+        setShowAlert(true);
+        
+        // Navigate to main app after successful login
+        setTimeout(() => {
+          setShowAlert(false);
+          router.replace('/(tabs)');
+        }, 1500);
+      } else {
+        setAlertType('error');
+        setAlertMessage(result.error);
+        setShowAlert(true);
+      }
+    } catch (error) {
+      setAlertType('error');
+      setAlertMessage('একটি অপ্রত্যাশিত সমস্যা হয়েছে');
+      setShowAlert(true);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -65,6 +107,7 @@ export default function SignIn() {
             visible={showAlert}
             onClose={() => setShowAlert(false)}
             massage={alertMessage}
+            type={alertType}
           />
 
           <Image
@@ -73,21 +116,23 @@ export default function SignIn() {
           />
 
           <Text style={styles.title}>লগ ইন করুন</Text>
-          <Text style={styles.subtitle}>আমাদের ব্যাবসায়ের কাজের জন্য</Text>
+          <Text style={styles.subtitle}>আমাদের ব্যাবসায়ের কাজের জন্য</Text>
 
           <Input
-            //label="মোবাইল নম্বর"
-            placeholder="ই-মেইল/মোবাইল নম্বর"
+            placeholder="ই-মেইল ঠিকানা"
+            value={loginIdentifier}
             onChangeText={(text) => {
               setLoginIdentifier(text);
               if (text.trim()) setLoginError('');
             }}
             errorMessage={loginError}
+            keyboardType="email-address"
+            autoCapitalize="none"
           />
 
           <Input
-            //label="পাসওয়ার্ড"
             placeholder="পাসওয়ার্ড"
+            value={password}
             password={true}
             onChangeText={(text) => {
               setPassword(text);
@@ -97,7 +142,19 @@ export default function SignIn() {
           />
 
           <View style={styles.buttonContainer}>
-            <Button title="লগ ইন" onPress={onSignIn} />
+            <Button 
+              title={isLoading ? "লগ ইন হচ্ছে..." : "লগ ইন"} 
+              onPress={onSignIn}
+              disabled={isLoading}
+            />
+
+            {isLoading && (
+              <ActivityIndicator 
+                size="small" 
+                color={Colors.primary} 
+                style={styles.loadingIndicator}
+              />
+            )}
 
             <TouchableOpacity style={styles.registerPrompt}>
               <View style={{ flexDirection: 'row', marginTop: 10 }}>
@@ -178,6 +235,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 20,
     marginBottom: 20,
+  },
+  loadingIndicator: {
+    marginTop: 10,
   },
   registerPrompt: {
     marginTop: 30,
