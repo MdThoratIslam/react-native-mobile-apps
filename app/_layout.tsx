@@ -1,7 +1,8 @@
 import { Stack } from "expo-router";
 import { ConvexProvider, ConvexReactClient } from "convex/react";
 import { AuthProvider } from "../contexts/AuthContext";
-import { useFrameworkReady } from '../hooks/useFrameworkReady';
+import { useFrameworkReady } from '../hooks/useFrameworkReady'
+import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 
 export default function RootLayout() {
   useFrameworkReady();
